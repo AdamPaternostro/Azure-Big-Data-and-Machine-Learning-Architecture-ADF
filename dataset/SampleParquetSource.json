@@ -1,0 +1,61 @@
+{
+	"name": "SampleParquetSource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SampleDataSource",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "sample-big-data",
+				"container": "public"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "AccountKey",
+				"type": "INT32"
+			},
+			{
+				"name": "ParentAccountKey",
+				"type": "INT32"
+			},
+			{
+				"name": "AccountCodeAlternateKey",
+				"type": "INT32"
+			},
+			{
+				"name": "ParentAccountCodeAlternateKey",
+				"type": "INT32"
+			},
+			{
+				"name": "AccountDescription",
+				"type": "UTF8"
+			},
+			{
+				"name": "AccountType",
+				"type": "UTF8"
+			},
+			{
+				"name": "Operator",
+				"type": "UTF8"
+			},
+			{
+				"name": "CustomMembers",
+				"type": "UTF8"
+			},
+			{
+				"name": "ValueType",
+				"type": "UTF8"
+			},
+			{
+				"name": "CustomMemberOptions",
+				"type": "UTF8"
+			}
+		]
+	}
+}
