@@ -20,8 +20,7 @@
 						"type": "BinarySource",
 						"storeSettings": {
 							"type": "AzureBlobStorageReadSettings",
-							"recursive": true,
-							"wildcardFileName": "*.parquet"
+							"recursive": true
 						}
 					},
 					"sink": {
