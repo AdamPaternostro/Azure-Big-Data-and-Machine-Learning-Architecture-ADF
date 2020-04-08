@@ -10,8 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "*.parquet",
-				"folderPath": "sample-big-data",
 				"container": "public"
 			}
 		}
