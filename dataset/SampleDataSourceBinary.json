@@ -9,7 +9,10 @@
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobStorageLocation"
+				"type": "AzureBlobStorageLocation",
+				"fileName": "*.parquet",
+				"folderPath": "sample-big-data",
+				"container": "public"
 			}
 		}
 	}
