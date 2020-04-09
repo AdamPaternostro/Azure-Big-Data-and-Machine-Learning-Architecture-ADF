@@ -1,0 +1,30 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "datafactory00005"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SampleDataSource')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Sample data that will be downloaded to your data lake.",
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"sasUri": "https://adampaternostropublic.blob.core.windows.net/public?se=2030-04-10T12%3A21%3A00Z&sp=rl&sv=2018-03-28&sr=c&sig=USm051L16GAz4bgQGhacK6t6BEFSexDxQ1DeeIAui5Q%3D"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
