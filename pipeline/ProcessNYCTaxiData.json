@@ -96,7 +96,7 @@
 						"destfile": "green01.csv"
 					},
 					{
-						"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-021.csv",
+						"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-02.csv",
 						"destfilesystem": "raw",
 						"destdirectory": "tripdata/yellow/2019/02",
 						"destfile": "yellow01.csv"
@@ -240,7 +240,7 @@
 						"destfile": "green01.csv"
 					},
 					{
-						"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-021.csv",
+						"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-02.csv",
 						"destfilesystem": "raw",
 						"destdirectory": "tripdata/yellow/2018/02",
 						"destfile": "yellow01.csv"
