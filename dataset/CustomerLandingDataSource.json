@@ -5,11 +5,27 @@
 			"referenceName": "LandingZoneBlobStorage",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"inputFileSystem": {
+				"type": "string"
+			},
+			"inputFileDirectory": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation"
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().inputFileDirectory",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().inputFileSystem",
+					"type": "Expression"
+				}
 			}
 		}
 	}
