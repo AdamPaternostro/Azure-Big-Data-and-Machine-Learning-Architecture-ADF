@@ -42,7 +42,68 @@
 				"outputs": [
 					{
 						"referenceName": "YellowTaxiDataDestination",
+						"type": "DatasetReference",
+						"parameters": {
+							"FileSystem": "taxi",
+							"Directory": "raw/tripdata/yellow/2019/01",
+							"File": "yellowtripdata"
+						}
+					}
+				]
+			},
+			{
+				"name": "CopyYellowTripData_2019_02",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "CopyYellowTripData_2019_01",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "ParquetSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "YellowTaxiTrip2019",
 						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "YellowTaxiDataDestination",
+						"type": "DatasetReference",
+						"parameters": {
+							"FileSystem": "taxi",
+							"Directory": "raw/tripdata/yellow/2019/01",
+							"File": "yellowtripdata"
+						}
 					}
 				]
 			}

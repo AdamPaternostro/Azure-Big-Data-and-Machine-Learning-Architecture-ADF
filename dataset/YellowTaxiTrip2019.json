@@ -5,12 +5,20 @@
 			"referenceName": "NYCTaxiData",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"RelativeUrl": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
-				"relativeUrl": "/nyc-tlc/trip+data/yellow_tripdata_2019-01.csv"
+				"relativeUrl": {
+					"value": "@dataset().RelativeUrl",
+					"type": "Expression"
+				}
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
