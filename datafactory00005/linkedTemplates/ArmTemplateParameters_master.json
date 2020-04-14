@@ -6,7 +6,7 @@
 			"value": "datafactory00005"
 		},
 		"DataLakeStorage_properties_typeProperties_url": {
-			"value": "https://datalake00005.dfs.core.windows.net"
+			"value": "https://datalake00005.blob.core.windows.net/"
 		},
 		"SampleDataSource_sasUri": {
 			"value": ""

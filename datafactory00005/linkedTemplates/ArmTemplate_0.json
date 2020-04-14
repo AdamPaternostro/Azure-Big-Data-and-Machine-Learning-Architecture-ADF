@@ -9,7 +9,7 @@
 		},
 		"DataLakeStorage_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://datalake00005.dfs.core.windows.net"
+			"defaultValue": "https://datalake00005.blob.core.windows.net/"
 		},
 		"SampleDataSource_sasUri": {
 			"type": "secureString",
@@ -44,6 +44,31 @@
 				"typeProperties": {
 					"sasUri": "[parameters('SampleDataSource_sasUri')]"
 				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyLandingDataToDataLake')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 1
+						}
+					}
+				],
+				"parameters": {
+					"inputPath": {
+						"type": "string"
+					}
+				},
+				"annotations": []
 			},
 			"dependsOn": []
 		},

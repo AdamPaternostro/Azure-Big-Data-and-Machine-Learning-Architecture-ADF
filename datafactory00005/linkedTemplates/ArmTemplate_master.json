@@ -9,7 +9,7 @@
 		},
 		"DataLakeStorage_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://datalake00005.dfs.core.windows.net"
+			"defaultValue": "https://datalake00005.blob.core.windows.net/"
 		},
 		"SampleDataSource_sasUri": {
 			"type": "secureString",

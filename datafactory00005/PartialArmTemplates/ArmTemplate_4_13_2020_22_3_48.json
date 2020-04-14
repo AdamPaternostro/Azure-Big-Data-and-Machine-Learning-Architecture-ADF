@@ -6,14 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactory00005"
-		},
-		"DataLakeStorage_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://datalake00005.blob.core.windows.net/"
-		},
-		"SampleDataSource_sasUri": {
-			"type": "secureString",
-			"metadata": "Secure string for 'sasUri' of 'SampleDataSource'"
 		}
 	},
 	"variables": {
@@ -59,15 +51,13 @@
 						"inputs": [
 							{
 								"referenceName": "SampleDataSourceBinary",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						],
 						"outputs": [
 							{
 								"referenceName": "SampleDataDestinationBinary",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							}
 						]
 					}
@@ -119,9 +109,7 @@
 					}
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SampleDataSource')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DataLakeStorage')]",
@@ -131,21 +119,7 @@
 				"annotations": [],
 				"type": "AzureBlobFS",
 				"typeProperties": {
-					"url": "[parameters('DataLakeStorage_properties_typeProperties_url')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SampleDataSource')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Sample data that will be downloaded to your data lake.",
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"sasUri": "[parameters('SampleDataSource_sasUri')]"
+					"url": "https://datalake00005.blob.core.windows.net/"
 				}
 			},
 			"dependsOn": []
