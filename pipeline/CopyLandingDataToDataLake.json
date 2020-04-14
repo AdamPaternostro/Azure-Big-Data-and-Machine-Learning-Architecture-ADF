@@ -34,13 +34,33 @@
 				"inputs": [
 					{
 						"referenceName": "CustomerLandingDataSource",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"inputFileSystem": {
+								"value": "@pipeline().parameters.inputFileSystem",
+								"type": "Expression"
+							},
+							"inputFileDirectory": {
+								"value": "@pipeline().parameters.inputFileDirectory",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "CustomerLandingDataDestination",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"outputFileSystem": {
+								"value": "@pipeline().parameters.outputFileSystem",
+								"type": "Expression"
+							},
+							"outputFileDirectory": {
+								"value": "@pipeline().parameters.outputFileDirectory",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
