@@ -13,6 +13,9 @@
 			}
 		],
 		"parameters": {
+			"inputFile": {
+				"type": "string"
+			},
 			"inputPath": {
 				"type": "string"
 			}
