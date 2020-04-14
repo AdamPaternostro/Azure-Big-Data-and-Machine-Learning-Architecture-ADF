@@ -1,0 +1,25 @@
+{
+	"name": "NYC_Taxi_Data_Source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "NYCTaxiData",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"RelativeURL": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@dataset().RelativeURL",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
