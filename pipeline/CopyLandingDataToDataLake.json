@@ -12,6 +12,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"inputPath": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }
