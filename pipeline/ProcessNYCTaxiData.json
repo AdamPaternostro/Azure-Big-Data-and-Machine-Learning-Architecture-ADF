@@ -68,7 +68,7 @@
 											"type": "Expression"
 										},
 										"File": {
-											"value": "@item().File",
+											"value": "@item().destfile",
 											"type": "Expression"
 										}
 									}
