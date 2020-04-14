@@ -84,12 +84,16 @@
 				"type": "array",
 				"defaultValue": [
 					{
-						"source": "nyc-tlc/trip+data/yellow_tripdata_2019-01.csv",
-						"destination": "/raw/yellow/tripdata/2019/01/yellow01.csv"
+						"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-01.csv",
+						"destfilesystem": "raw",
+						"destdirectory": "yellow/tripdata/2019/01",
+						"destfile": "yellow01.csv"
 					},
 					{
-						"source": "nyc-tlc/trip+data/green_tripdata_2019-01.csv",
-						"destination": "/raw/green/tripdata/2019/01/green01.csv"
+						"source": "/nyc-tlc/trip+data/green_tripdata_2019-01.csv",
+						"destfilesystem": "raw",
+						"destdirectory": "green/tripdata/2019/01",
+						"destfile": "green01.csv"
 					}
 				]
 			}
