@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "AzureBlobFS",
 		"typeProperties": {
-			"url": "https://datalake00005.blob.core.windows.net/"
+			"url": "https://datalake00005.dfs.core.windows.net"
 		}
 	}
 }
