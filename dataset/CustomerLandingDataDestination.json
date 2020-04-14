@@ -5,11 +5,27 @@
 			"referenceName": "DataLakeStorage",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"outputFileSystem": {
+				"type": "string"
+			},
+			"outputFileDirectory": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation"
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().outputFileDirectory",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().outputFileSystem",
+					"type": "Expression"
+				}
 			}
 		}
 	}
