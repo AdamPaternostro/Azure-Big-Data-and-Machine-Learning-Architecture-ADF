@@ -11,6 +11,9 @@
 		"SampleDataSource_sasUri": {
 			"value": ""
 		},
+		"LandingZoneBlobStorage_properties_typeProperties_url": {
+			"value": "https://landingzonestorage00005.dfs.core.windows.net"
+		},
 		"containerUri": {
 			"value": ""
 		},

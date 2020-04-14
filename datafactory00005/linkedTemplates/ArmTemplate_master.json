@@ -15,6 +15,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'sasUri' of 'SampleDataSource'"
 		},
+		"LandingZoneBlobStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://landingzonestorage00005.dfs.core.windows.net"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -47,6 +51,9 @@
 					},
 					"SampleDataSource_sasUri": {
 						"value": "[parameters('SampleDataSource_sasUri')]"
+					},
+					"LandingZoneBlobStorage_properties_typeProperties_url": {
+						"value": "[parameters('LandingZoneBlobStorage_properties_typeProperties_url')]"
 					}
 				}
 			},

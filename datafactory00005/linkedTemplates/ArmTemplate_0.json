@@ -14,6 +14,10 @@
 		"SampleDataSource_sasUri": {
 			"type": "secureString",
 			"metadata": "Secure string for 'sasUri' of 'SampleDataSource'"
+		},
+		"LandingZoneBlobStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://landingzonestorage00005.dfs.core.windows.net"
 		}
 	},
 	"variables": {
@@ -48,27 +52,15 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/CopyLandingDataToDataLake')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/LandingZoneBlobStorage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "Wait1",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					}
-				],
-				"parameters": {
-					"inputPath": {
-						"type": "string"
-					}
-				},
-				"annotations": []
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LandingZoneBlobStorage_properties_typeProperties_url')]"
+				}
 			},
 			"dependsOn": []
 		},
@@ -114,6 +106,80 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SampleDataSource')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerLandingDataSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LandingZoneBlobStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"inputFileSystem": {
+						"type": "string"
+					},
+					"inputFileDirectory": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().inputFileDirectory",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().inputFileSystem",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LandingZoneBlobStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerLandingDataDestination')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"outputFileSystem": {
+						"type": "string"
+					},
+					"outputFileDirectory": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().outputFileDirectory",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().outputFileSystem",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/DataLakeStorage')]"
 			]
 		},
 		{
@@ -173,6 +239,96 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/SampleDataSourceBinary')]",
 				"[concat(variables('factoryId'), '/datasets/SampleDataDestinationBinary')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyLandingDataToDataLake')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Landing Data",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "CustomerLandingDataSource",
+								"type": "DatasetReference",
+								"parameters": {
+									"inputFileSystem": {
+										"value": "@pipeline().parameters.inputFileSystem",
+										"type": "Expression"
+									},
+									"inputFileDirectory": {
+										"value": "@pipeline().parameters.inputFileDirectory",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "CustomerLandingDataDestination",
+								"type": "DatasetReference",
+								"parameters": {
+									"outputFileSystem": {
+										"value": "@pipeline().parameters.outputFileSystem",
+										"type": "Expression"
+									},
+									"outputFileDirectory": {
+										"value": "@pipeline().parameters.outputFileDirectory",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"parameters": {
+					"inputFileSystem": {
+						"type": "string"
+					},
+					"inputFileDirectory": {
+						"type": "string"
+					},
+					"outputFileSystem": {
+						"type": "string"
+					},
+					"outputFileDirectory": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/CustomerLandingDataSource')]",
+				"[concat(variables('factoryId'), '/datasets/CustomerLandingDataDestination')]"
 			]
 		}
 	]
