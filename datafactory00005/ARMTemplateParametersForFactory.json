@@ -8,11 +8,14 @@
 		"DataLakeStorage_properties_typeProperties_url": {
 			"value": "https://datalake00005.dfs.core.windows.net"
 		},
-		"SampleDataSource_sasUri": {
-			"value": ""
-		},
 		"LandingZoneBlobStorage_properties_typeProperties_url": {
 			"value": "https://landingzonestorage00005.dfs.core.windows.net"
+		},
+		"NYCTaxiData_properties_typeProperties_url": {
+			"value": "https://s3.amazonaws.com"
+		},
+		"SampleDataSource_sasUri": {
+			"value": ""
 		}
 	}
 }

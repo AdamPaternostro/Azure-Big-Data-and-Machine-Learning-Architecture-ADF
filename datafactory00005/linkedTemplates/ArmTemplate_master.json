@@ -11,13 +11,17 @@
 			"type": "string",
 			"defaultValue": "https://datalake00005.dfs.core.windows.net"
 		},
-		"SampleDataSource_sasUri": {
-			"type": "secureString",
-			"metadata": "Secure string for 'sasUri' of 'SampleDataSource'"
-		},
 		"LandingZoneBlobStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://landingzonestorage00005.dfs.core.windows.net"
+		},
+		"NYCTaxiData_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://s3.amazonaws.com"
+		},
+		"SampleDataSource_sasUri": {
+			"type": "secureString",
+			"metadata": "Secure string for 'sasUri' of 'SampleDataSource'"
 		},
 		"containerUri": {
 			"type": "string",
@@ -49,11 +53,14 @@
 					"DataLakeStorage_properties_typeProperties_url": {
 						"value": "[parameters('DataLakeStorage_properties_typeProperties_url')]"
 					},
-					"SampleDataSource_sasUri": {
-						"value": "[parameters('SampleDataSource_sasUri')]"
-					},
 					"LandingZoneBlobStorage_properties_typeProperties_url": {
 						"value": "[parameters('LandingZoneBlobStorage_properties_typeProperties_url')]"
+					},
+					"NYCTaxiData_properties_typeProperties_url": {
+						"value": "[parameters('NYCTaxiData_properties_typeProperties_url')]"
+					},
+					"SampleDataSource_sasUri": {
+						"value": "[parameters('SampleDataSource_sasUri')]"
 					}
 				}
 			},

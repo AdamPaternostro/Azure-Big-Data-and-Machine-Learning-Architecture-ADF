@@ -11,13 +11,17 @@
 			"type": "string",
 			"defaultValue": "https://datalake00005.dfs.core.windows.net"
 		},
-		"SampleDataSource_sasUri": {
-			"type": "secureString",
-			"metadata": "Secure string for 'sasUri' of 'SampleDataSource'"
-		},
 		"LandingZoneBlobStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://landingzonestorage00005.dfs.core.windows.net"
+		},
+		"NYCTaxiData_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://s3.amazonaws.com"
+		},
+		"SampleDataSource_sasUri": {
+			"type": "secureString",
+			"metadata": "Secure string for 'sasUri' of 'SampleDataSource'"
 		}
 	},
 	"variables": {
@@ -38,6 +42,34 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LandingZoneBlobStorage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LandingZoneBlobStorage_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/NYCTaxiData')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('NYCTaxiData_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": false,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SampleDataSource')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -52,17 +84,152 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LandingZoneBlobStorage')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/CustomerLandingDataDestination')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"outputFileSystem": {
+						"type": "string"
+					},
+					"outputFileDirectory": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
-				"type": "AzureBlobFS",
+				"type": "Binary",
 				"typeProperties": {
-					"url": "[parameters('LandingZoneBlobStorage_properties_typeProperties_url')]"
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().outputFileDirectory",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().outputFileSystem",
+							"type": "Expression"
+						}
+					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/DataLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerLandingDataSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LandingZoneBlobStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"inputFileSystem": {
+						"type": "string"
+					},
+					"inputFileDirectory": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().inputFileDirectory",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().inputFileSystem",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LandingZoneBlobStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/NYC_Taxi_Data_Destination')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DataLakeStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"FileSystem": {
+						"type": "string"
+					},
+					"Directory": {
+						"type": "string"
+					},
+					"File": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().File",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().Directory",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().FileSystem",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/DataLakeStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/NYC_Taxi_Data_Source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "NYCTaxiData",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"RelativeURL": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().RelativeURL",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/NYCTaxiData')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/SampleDataDestinationBinary')]",
@@ -106,139 +273,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/SampleDataSource')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CustomerLandingDataSource')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LandingZoneBlobStorage",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"inputFileSystem": {
-						"type": "string"
-					},
-					"inputFileDirectory": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": {
-							"value": "@dataset().inputFileDirectory",
-							"type": "Expression"
-						},
-						"fileSystem": {
-							"value": "@dataset().inputFileSystem",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LandingZoneBlobStorage')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CustomerLandingDataDestination')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DataLakeStorage",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"outputFileSystem": {
-						"type": "string"
-					},
-					"outputFileDirectory": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": {
-							"value": "@dataset().outputFileDirectory",
-							"type": "Expression"
-						},
-						"fileSystem": {
-							"value": "@dataset().outputFileSystem",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/DataLakeStorage')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CopySampleDWDataToDataLake')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy Sample Data",
-						"description": "Copies from the public storage account to your data lake for testing",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "BinarySource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true
-								}
-							},
-							"sink": {
-								"type": "BinarySink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings",
-									"copyBehavior": "PreserveHierarchy"
-								}
-							},
-							"enableStaging": false
-						},
-						"inputs": [
-							{
-								"referenceName": "SampleDataSourceBinary",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "SampleDataDestinationBinary",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SampleDataSourceBinary')]",
-				"[concat(variables('factoryId'), '/datasets/SampleDataDestinationBinary')]"
 			]
 		},
 		{
@@ -329,6 +363,450 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/CustomerLandingDataSource')]",
 				"[concat(variables('factoryId'), '/datasets/CustomerLandingDataDestination')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CopySampleDWDataToDataLake')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Sample Data",
+						"description": "Copies from the public storage account to your data lake for testing",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "SampleDataSourceBinary",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SampleDataDestinationBinary",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SampleDataSourceBinary')]",
+				"[concat(variables('factoryId'), '/datasets/SampleDataDestinationBinary')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ProcessNYCTaxiData')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DownloadEachFile",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.FilesToCopy",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "CopyTaxiData",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "HttpReadSettings",
+												"requestMethod": "GET"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "NYC_Taxi_Data_Source",
+											"type": "DatasetReference",
+											"parameters": {
+												"RelativeURL": {
+													"value": "@item().source",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "NYC_Taxi_Data_Destination",
+											"type": "DatasetReference",
+											"parameters": {
+												"FileSystem": {
+													"value": "@item().destfilesystem",
+													"type": "Expression"
+												},
+												"Directory": {
+													"value": "@item().destdirectory",
+													"type": "Expression"
+												},
+												"File": {
+													"value": "@item().destfile",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"FilesToCopy": {
+						"type": "array",
+						"defaultValue": [
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-01.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/01",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-01.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/01",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-02.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/02",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-02.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/02",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-03.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/03",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-03.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/03",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-04.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/04",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-04.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/04",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-05.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/05",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-05.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/05",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-06.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/06",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-06.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/06",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-07.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/07",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-07.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/07",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-08.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/08",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-08.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/08",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-09.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/09",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-09.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/09",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-10.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/10",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-10.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/10",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-11.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/11",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-11.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/11",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2019-12.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2019/12",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2019-12.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2019/12",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-01.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/01",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-01.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/01",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-02.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/02",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-02.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/02",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-03.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/03",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-03.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/03",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-04.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/04",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-04.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/04",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-05.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/05",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-05.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/05",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-06.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/06",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-06.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/06",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-07.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/07",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-07.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/07",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-08.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/08",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-08.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/08",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-09.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/09",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-09.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/09",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-10.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/10",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-10.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/10",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-11.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/11",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-11.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/11",
+								"destfile": "green01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/yellow_tripdata_2018-12.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/yellow/2018/12",
+								"destfile": "yellow01.csv"
+							},
+							{
+								"source": "/nyc-tlc/trip+data/green_tripdata_2018-12.csv",
+								"destfilesystem": "raw",
+								"destdirectory": "tripdata/green/2018/12",
+								"destfile": "green01.csv"
+							}
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/NYC_Taxi_Data_Source')]",
+				"[concat(variables('factoryId'), '/datasets/NYC_Taxi_Data_Destination')]"
 			]
 		}
 	]
