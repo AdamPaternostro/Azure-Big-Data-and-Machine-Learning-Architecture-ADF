@@ -1,0 +1,107 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "datafactory00005"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyLandingDataToDataLake')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy Landing Data",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "CustomerLandingDataSource",
+								"type": "DatasetReference",
+								"parameters": {
+									"inputFileSystem": {
+										"value": "@pipeline().parameters.inputFileSystem",
+										"type": "Expression"
+									},
+									"inputFileDirectory": {
+										"value": "@pipeline().parameters.inputFileDirectory",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "CustomerLandingDataDestination",
+								"type": "DatasetReference",
+								"parameters": {
+									"outputFileSystem": {
+										"value": "@pipeline().parameters.outputFileSystem",
+										"type": "Expression"
+									},
+									"outputFileDirectory": {
+										"value": "@pipeline().parameters.outputFileDirectory",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"parameters": {
+					"inputFileSystem": {
+						"type": "string",
+						"defaultValue": "acmeinc"
+					},
+					"inputFileDirectory": {
+						"type": "string",
+						"defaultValue": "inbox/adam"
+					},
+					"outputFileSystem": {
+						"type": "string",
+						"defaultValue": "raw"
+					},
+					"outputFileDirectory": {
+						"type": "string",
+						"defaultValue": "acmeinc/adam"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}
