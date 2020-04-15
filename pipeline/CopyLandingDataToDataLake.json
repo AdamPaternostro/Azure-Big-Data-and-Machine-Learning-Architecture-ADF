@@ -67,16 +67,20 @@
 		],
 		"parameters": {
 			"inputFileSystem": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "acmeinc"
 			},
 			"inputFileDirectory": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "inbox/adam"
 			},
 			"outputFileSystem": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "raw"
 			},
 			"outputFileDirectory": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "acmeinc/adam"
 			}
 		},
 		"annotations": []
