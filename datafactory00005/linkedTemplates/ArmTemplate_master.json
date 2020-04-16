@@ -19,10 +19,6 @@
 			"type": "string",
 			"defaultValue": "https://s3.amazonaws.com"
 		},
-		"SampleDataSource_sasUri": {
-			"type": "secureString",
-			"metadata": "Secure string for 'sasUri' of 'SampleDataSource'"
-		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -58,9 +54,6 @@
 					},
 					"NYCTaxiData_properties_typeProperties_url": {
 						"value": "[parameters('NYCTaxiData_properties_typeProperties_url')]"
-					},
-					"SampleDataSource_sasUri": {
-						"value": "[parameters('SampleDataSource_sasUri')]"
 					}
 				}
 			},
